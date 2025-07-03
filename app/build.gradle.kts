@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.kleberson.appmedical"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.kleberson.appmedical"
