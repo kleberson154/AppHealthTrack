@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">AppMedical</string>
+    <string name="email">Email</string>
+    <string name="senha">Senha</string>
 </resources>

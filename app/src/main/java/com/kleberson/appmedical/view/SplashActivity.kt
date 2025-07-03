@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.os.Handler
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import com.kleberson.appmedical.MainActivity
 import com.kleberson.appmedical.R
 
 class SplashActivity: AppCompatActivity() {
@@ -15,7 +14,7 @@ class SplashActivity: AppCompatActivity() {
         setContentView(R.layout.activity_splash)
 
         Handler().postDelayed({
-            startActivity(Intent(this, MainActivity::class.java))
+            startActivity(Intent(this, EnterActivity::class.java))
             finish()
         }, 2000)
     }
