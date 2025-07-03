@@ -79,15 +79,15 @@ class Db(context: Context): SQLiteOpenHelper(context, "healthTrack.db", null, 1)
             put("dateLimit", SimpleDateFormat("yyyy-MM-dd").format(medicineDateLimit))
             put("user_id", user.id)
         }
-        db.insert("activities", null, values)
+        db.insert("medicines", null, values)
         db.close()
     }
 
     @SuppressLint("Range", "SimpleDateFormat")
     fun getMedicinesByUser(id: Int): MutableList<Medicines> {
         val db = readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM activities WHERE user_id = ?", arrayOf(id.toString()))
-        val activities = mutableListOf<Medicines>()
+        val cursor = db.rawQuery("SELECT * FROM medicines WHERE user_id = ?", arrayOf(id.toString()))
+        val medicines = mutableListOf<Medicines>()
 
         if (cursor.moveToFirst()) {
             do {
@@ -97,16 +97,16 @@ class Db(context: Context): SQLiteOpenHelper(context, "healthTrack.db", null, 1)
                 val time = cursor.getString(cursor.getColumnIndex("type"))
                 val dateLimit = SimpleDateFormat("yyyy-MM-dd").format(cursor.getString(cursor.getColumnIndex("date")))
 
-                activities.add(Medicines(idMedicines, name, quantity, time, dateLimit))
+                medicines.add(Medicines(idMedicines, name, quantity, time, dateLimit))
             } while (cursor.moveToNext())
         }
         cursor.close()
-        return activities
+        return medicines
     }
 
     fun deleteMedicine(medicines: Medicines) {
         val db = writableDatabase
-        db.delete("activities", "id = ?", arrayOf(medicines.id.toString()))
+        db.delete("medicines", "id = ?", arrayOf(medicines.id.toString()))
         db.close()
     }
 
