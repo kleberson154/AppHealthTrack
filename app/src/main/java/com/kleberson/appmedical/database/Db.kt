@@ -10,6 +10,7 @@ import com.kleberson.appmedical.model.Medicines
 import com.kleberson.appmedical.model.User
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneId
 import java.util.Date
 
 class Db(context: Context): SQLiteOpenHelper(context, "healthTrack.db", null, 1) {
@@ -116,4 +117,15 @@ class Db(context: Context): SQLiteOpenHelper(context, "healthTrack.db", null, 1)
         return medicinesList
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun removeExpiredMedicines(id: Int) {
+        val db = writableDatabase
+        val currentDate = LocalDateTime.now(ZoneId.of("America/Sao_Paulo")).toString()
+        db.delete("medicines", "dateLimit < ?", arrayOf(currentDate))
+        db.close()
+    }
+
 }
+
+//INSERT INTO medicines (name, quantity, time, dateLimit, atDate, user_id)
+//VALUES ('NomeDoRemedio', 'Quantidade', 8, '03/07/2025', '08:00', 1);

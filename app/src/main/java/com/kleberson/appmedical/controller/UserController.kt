@@ -110,4 +110,10 @@ class UserController(context: Context) {
 
         return medicinesList
     }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun removeMedicinesExpired(emailUser: String) {
+        val user = getUserByEmail(emailUser)
+        db.removeExpiredMedicines(user.id)
+    }
 }

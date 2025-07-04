@@ -20,7 +20,7 @@
                 android:id="@+id/textViewNameMedicine"
                 android:layout_width="match_parent"
                 android:layout_height="26dp"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="10dp"
                 android:text="Name"
                 android:textColor="@color/black"
                 android:textSize="20sp" />
@@ -29,7 +29,7 @@
                 android:id="@+id/textViewDateMedicine"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
+                android:layout_marginStart="10dp"
                 android:text="Usar até: 12/12/2025"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
@@ -57,9 +57,25 @@
                 android:id="@+id/textViewQuantityMedicine"
                 android:layout_width="match_parent"
                 android:layout_height="22dp"
-                android:text="Quantidade: 2 comprimidos"
+                android:text="2 comprimidos"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="50dp"
+            android:layout_height="45dp"
+            android:orientation="vertical"
+
+
+            >
+
+            <ImageButton
+                android:id="@+id/buttonCheckHour"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                android:background="@drawable/baseline_check_24" />
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>
