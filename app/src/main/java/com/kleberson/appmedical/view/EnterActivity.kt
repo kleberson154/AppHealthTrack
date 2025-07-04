@@ -16,6 +16,9 @@ class EnterActivity: AppCompatActivity() {
         val btnLogin = findViewById<Button>(R.id.buttonEnterLogin)
         val btnRegister = findViewById<Button>(R.id.buttonEnterSignUp)
 
+        val db = com.kleberson.appmedical.database.Db(this)
+        db.onOpen(db.writableDatabase)
+
         btnLogin.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
         }
