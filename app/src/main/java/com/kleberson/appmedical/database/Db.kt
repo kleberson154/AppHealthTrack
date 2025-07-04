@@ -125,6 +125,15 @@ class Db(context: Context): SQLiteOpenHelper(context, "healthTrack.db", null, 1)
         db.close()
     }
 
+    fun updateMedicineTime(medicine: Medicines) {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("atDate", medicine.atDate.toString())
+        }
+        db.update("medicines", values, "id = ?", arrayOf(medicine.id.toString()))
+        db.close()
+    }
+
 }
 
 //INSERT INTO medicines (name, quantity, time, dateLimit, atDate, user_id)

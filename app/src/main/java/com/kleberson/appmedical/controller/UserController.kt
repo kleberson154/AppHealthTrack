@@ -116,4 +116,13 @@ class UserController(context: Context) {
         val user = getUserByEmail(emailUser)
         db.removeExpiredMedicines(user.id)
     }
+
+    fun updateMedicineTime(medicine: Medicines, novaAtDate: LocalTime?, context: Context?) {
+        if (novaAtDate != null) {
+            medicine.atDate = novaAtDate
+            db.updateMedicineTime(medicine)
+            Toast.makeText(context, "Hora do medicamento atualizada com sucesso!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 }
