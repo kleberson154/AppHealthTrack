@@ -30,15 +30,19 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+
         val userController = UserController(this)
         val user = userController.getUserByEmail(emailUser)
         val medicines = userController.getMedicinesUser(emailUser)
+
+        medicines.removeAll { it.dateLimit < Date.from(LocalDate.now(ZoneId.of("America/Sao_Paulo")).atStartOfDay(ZoneId.of("America/Sao_Paulo")).toInstant()) }
+        userController.removeMedicinesExpired(emailUser)
 
         val userName = findViewById<TextView>(R.id.textViewNameUser)
         userName.text = user.name
 
         val btnAddMedicamentos = findViewById<Button>(R.id.buttonAddMedicamentos)
-        val btnFinalizar = findViewById<Button>(R.id.buttonFinalizar)
+        val btnFinalizarApp = findViewById<Button>(R.id.buttonFinalizar)
 
         val recycleActivities = findViewById<RecyclerView>(R.id.recycleMedicines)
         recycleActivities.addItemDecoration(VerticalSpaceItemDecoration(16))
@@ -46,16 +50,12 @@ class MainActivity : AppCompatActivity() {
         recycleActivities.layoutManager = LinearLayoutManager(this)
         recycleActivities.adapter = adapter
 
-        medicines.removeAll { it.dateLimit < Date.from(LocalDate.now(ZoneId.of("America/Sao_Paulo")).atStartOfDay(ZoneId.of("America/Sao_Paulo")).toInstant()) }
-        userController.removeMedicinesExpired(emailUser)
-
         btnAddMedicamentos.setOnClickListener {
             startActivity(Intent(this, AddMedicinesActivity::class.java).putExtra("email", emailUser))
         }
 
-        btnFinalizar.setOnClickListener {
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
+        btnFinalizarApp.setOnClickListener {
+            finishAffinity()
         }
     }
 

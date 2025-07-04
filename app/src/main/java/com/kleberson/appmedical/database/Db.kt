@@ -120,8 +120,8 @@ class Db(context: Context): SQLiteOpenHelper(context, "healthTrack.db", null, 1)
     @RequiresApi(Build.VERSION_CODES.O)
     fun removeExpiredMedicines(id: Int) {
         val db = writableDatabase
-        val currentDate = LocalDateTime.now(ZoneId.of("America/Sao_Paulo")).toString()
-        db.delete("medicines", "dateLimit < ?", arrayOf(currentDate))
+        val currentDate = Date.from(LocalDateTime.now().atZone(ZoneId.of("America/Sao_Paulo")).toInstant())
+        db.delete("medicines", "id = ? AND dateLimit < ?", arrayOf(id.toString(), currentDate.toString()))
         db.close()
     }
 

@@ -1,5 +1,10 @@
 package com.kleberson.appmedical.view
 
+import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.media.Image
 import android.os.Build
 import android.view.LayoutInflater
@@ -40,6 +45,7 @@ class MedicineAdapter(private val medicines: MutableList<Medicines>): RecyclerVi
         return ViewHolder(view)
     }
 
+    @SuppressLint("ScheduleExactAlarm")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val medicine = medicines[position]
@@ -51,8 +57,42 @@ class MedicineAdapter(private val medicines: MutableList<Medicines>): RecyclerVi
         holder.quantity.text = medicine.quantity
 
         holder.btnCheckHour.setOnClickListener{
+            val context = holder.itemView.context
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                if (!alarmManager.canScheduleExactAlarms()) {
+                    val intent = Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                    context.startActivity(intent)
+                    return@setOnClickListener
+                }
+            }
+
             val novaAtDate = LocalTime.now(ZoneId.of("America/Sao_Paulo"))
             userController.updateMedicineTime(medicine, novaAtDate, holder.itemView.context)
+
+            val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
+                putExtra("medicine_name", medicine.name)
+            }
+            val pendingIntent = PendingIntent.getBroadcast(
+                context, position, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+//            val nextDoseMillis = System.currentTimeMillis() + 10_000
+//            alarmManager.setExactAndAllowWhileIdle(
+//                AlarmManager.RTC_WAKEUP,
+//                nextDoseMillis,
+//                pendingIntent
+//            )
+
+            val nextDoseMillis = System.currentTimeMillis() + medicine.time * 60 * 60 * 1000
+            alarmManager.setExact(
+                AlarmManager.RTC_WAKEUP,
+                nextDoseMillis,
+                pendingIntent
+            )
+
             proximaHora = medicine.atDate.plusHours(medicine.time.toLong()).format(DateTimeFormatter.ofPattern("HH:mm"))
             holder.time.text = proximaHora
         }

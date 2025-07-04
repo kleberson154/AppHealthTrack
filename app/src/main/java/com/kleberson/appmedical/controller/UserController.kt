@@ -10,7 +10,9 @@ import com.kleberson.appmedical.exception.UserExistException
 import com.kleberson.appmedical.exception.UserNotExistException
 import com.kleberson.appmedical.model.Medicines
 import com.kleberson.appmedical.model.User
+import java.time.LocalDate
 import java.time.LocalTime
+import java.time.ZoneId
 import java.util.Date
 
 class UserController(context: Context) {
@@ -112,9 +114,12 @@ class UserController(context: Context) {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun removeMedicinesExpired(emailUser: String) {
-        val user = getUserByEmail(emailUser)
-        db.removeExpiredMedicines(user.id)
+    fun removeMedicinesExpired(email: String) {
+        val medicines = getMedicinesUser(email)
+        val now = LocalDate.now(ZoneId.of("America/Sao_Paulo"))
+        medicines.filter {
+            it.dateLimit.toInstant().atZone(ZoneId.of("America/Sao_Paulo")).toLocalDate() <= now
+        }.forEach { db.removeExpiredMedicines(it.id) }
     }
 
     fun updateMedicineTime(medicine: Medicines, novaAtDate: LocalTime?, context: Context?) {
