@@ -4,15 +4,19 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteOpenHelper
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.kleberson.appmedical.model.Medicines
 import com.kleberson.appmedical.model.User
-import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
 import java.util.Date
 
 class Db(context: Context): SQLiteOpenHelper(context, "healthTrack.db", null, 1) {
     override fun onCreate(db: android.database.sqlite.SQLiteDatabase) {
         db.execSQL("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT UNIQUE, password TEXT, contact TEXT)")
-        db.execSQL("CREATE TABLE IF NOT EXISTS medicines (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, quantity TEXT, time TEXT, dateLimit TEXT, user_id INTEGER, FOREIGN KEY(user_id) REFERENCES users(id))")
+        db.execSQL("CREATE TABLE IF NOT EXISTS medicines (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, quantity TEXT, time INT, dateLimit TEXT, atDate TEXT, user_id INTEGER, FOREIGN KEY(user_id) REFERENCES users(id))")
     }
 
     override fun onUpgrade(db: android.database.sqlite.SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -69,40 +73,6 @@ class Db(context: Context): SQLiteOpenHelper(context, "healthTrack.db", null, 1)
         }
     }
 
-    @SuppressLint("SimpleDateFormat")
-    fun insertMedicine(user: User, medicineName: String, medicineQuantity: String, medicineTime: String, medicineDateLimit: Date) {
-        val db = writableDatabase
-        val values = ContentValues().apply {
-            put("name", medicineName)
-            put("quantity", medicineQuantity)
-            put("time", medicineTime)
-            put("dateLimit", SimpleDateFormat("yyyy-MM-dd").format(medicineDateLimit))
-            put("user_id", user.id)
-        }
-        db.insert("medicines", null, values)
-        db.close()
-    }
-
-    @SuppressLint("Range", "SimpleDateFormat")
-    fun getMedicinesByUser(id: Int): MutableList<Medicines> {
-        val db = readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM medicines WHERE user_id = ?", arrayOf(id.toString()))
-        val medicines = mutableListOf<Medicines>()
-
-        if (cursor.moveToFirst()) {
-            do {
-                val idMedicines = cursor.getInt(cursor.getColumnIndex("id"))
-                val name = cursor.getString(cursor.getColumnIndex("name"))
-                val quantity = cursor.getString(cursor.getColumnIndex("category"))
-                val time = cursor.getString(cursor.getColumnIndex("type"))
-                val dateLimit = SimpleDateFormat("yyyy-MM-dd").format(cursor.getString(cursor.getColumnIndex("date")))
-
-                medicines.add(Medicines(idMedicines, name, quantity, time, dateLimit))
-            } while (cursor.moveToNext())
-        }
-        cursor.close()
-        return medicines
-    }
 
     fun deleteMedicine(medicines: Medicines) {
         val db = writableDatabase
@@ -110,4 +80,61 @@ class Db(context: Context): SQLiteOpenHelper(context, "healthTrack.db", null, 1)
         db.close()
     }
 
+    fun insertMedicine(medicines: Medicines, id: Int) {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("name", medicines.name)
+            put("quantity", medicines.quantity)
+            put("time", medicines.time)
+            put("dateLimit", medicines.dateLimit.toString())
+            put("atDate", medicines.atDate.toString())
+            put("user_id", id)
+        }
+        db.insert("medicines", null, values)
+        db.close()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @SuppressLint("Range")
+    fun getMedicinesByUserId(id: Int): MutableList<Medicines> {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM medicines WHERE user_id = ?", arrayOf(id.toString()))
+        val medicinesList = mutableListOf<Medicines>()
+
+        if (cursor.moveToFirst()) {
+            do {
+                val idMedicine = cursor.getInt(cursor.getColumnIndex("id"))
+                val name = cursor.getString(cursor.getColumnIndex("name"))
+                val quantity = cursor.getString(cursor.getColumnIndex("quantity"))
+                val time = cursor.getInt(cursor.getColumnIndex("time"))
+                val dateLimit = Date(cursor.getString(cursor.getColumnIndex("dateLimit")))
+                val atDate = LocalTime.parse(cursor.getString(cursor.getColumnIndex("atDate")))
+
+                medicinesList.add(Medicines(idMedicine, name, quantity, time, dateLimit, atDate))
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return medicinesList
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun removeExpiredMedicines(id: Int) {
+        val db = writableDatabase
+        val currentDate = Date.from(LocalDateTime.now().atZone(ZoneId.of("America/Sao_Paulo")).toInstant())
+        db.delete("medicines", "id = ? AND dateLimit < ?", arrayOf(id.toString(), currentDate.toString()))
+        db.close()
+    }
+
+    fun updateMedicineTime(medicine: Medicines) {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("atDate", medicine.atDate.toString())
+        }
+        db.update("medicines", values, "id = ?", arrayOf(medicine.id.toString()))
+        db.close()
+    }
+
 }
+
+//INSERT INTO medicines (name, quantity, time, dateLimit, atDate, user_id)
+//VALUES ('NomeDoRemedio', 'Quantidade', 8, '03/07/2025', '08:00', 1);

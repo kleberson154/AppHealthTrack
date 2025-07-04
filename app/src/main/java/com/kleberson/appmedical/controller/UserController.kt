@@ -1,13 +1,18 @@
 package com.kleberson.appmedical.controller
 
 import android.content.Context
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import com.kleberson.appmedical.database.Db
 import com.kleberson.appmedical.exception.PasswordNotEqualsException
 import com.kleberson.appmedical.exception.UserExistException
 import com.kleberson.appmedical.exception.UserNotExistException
 import com.kleberson.appmedical.model.Medicines
 import com.kleberson.appmedical.model.User
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
 import java.util.Date
 
 class UserController(context: Context) {
@@ -70,22 +75,6 @@ class UserController(context: Context) {
         return user
     }
 
-    fun addMedicine(context: Context, userEmail: String, medicineName: String, medicineQuantity: String, medicineTime: String, medicineDateLimit: Date) {
-        try {
-            val user = db.getUserByEmail(userEmail) ?: throw UserNotExistException("Usuário não encontrado")
-            db.insertMedicine(user, medicineName, medicineQuantity, medicineTime, medicineDateLimit)
-            Toast.makeText(context, "Atividade adicionada com sucesso!", Toast.LENGTH_SHORT).show()
-        } catch (e: UserNotExistException) {
-            e.printStackTrace()
-            Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
-        }
-    }
-
-    fun getMedicinesUser(emailUser: String): MutableList<Medicines> {
-        val user = db.getUserByEmail(emailUser) ?: throw UserNotExistException("Usuário não encontrado")
-
-        return db.getMedicinesByUser(user.id)
-    }
 
     fun deleteMedicine(medicines: Medicines, context: Context) {
         try {
@@ -96,4 +85,49 @@ class UserController(context: Context) {
             Toast.makeText(context, "Erro ao remover medicamento: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun addMedicine(
+        context: Context, name: String, quantity: String, time: Int, dateLimit: Date, atDate: LocalTime,
+        emailUser: String) {
+        try {
+            val user = getUserByEmail(emailUser)
+            val medicines = Medicines(id = 0, name = name, quantity = quantity, time = time, dateLimit = dateLimit, atDate = atDate)
+            db.insertMedicine(medicines, user.id)
+            Toast.makeText(context, "Medicamento adicionado com sucesso!", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(context, "Erro ao adicionar medicamento: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getMedicinesUser(emailUser: String): MutableList<Medicines> {
+        val user = getUserByEmail(emailUser)
+        val medicinesList = db.getMedicinesByUserId(user.id)
+
+        if (medicinesList.isEmpty()) {
+            return mutableListOf()
+        }
+
+        return medicinesList
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun removeMedicinesExpired(email: String) {
+        val medicines = getMedicinesUser(email)
+        val now = LocalDate.now(ZoneId.of("America/Sao_Paulo"))
+        medicines.filter {
+            it.dateLimit.toInstant().atZone(ZoneId.of("America/Sao_Paulo")).toLocalDate() <= now
+        }.forEach { db.removeExpiredMedicines(it.id) }
+    }
+
+    fun updateMedicineTime(medicine: Medicines, novaAtDate: LocalTime?, context: Context?) {
+        if (novaAtDate != null) {
+            medicine.atDate = novaAtDate
+            db.updateMedicineTime(medicine)
+            Toast.makeText(context, "Hora do medicamento atualizada com sucesso!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 }

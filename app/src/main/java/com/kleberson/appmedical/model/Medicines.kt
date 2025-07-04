@@ -1,6 +1,9 @@
 package com.kleberson.appmedical.model
 
-data class Medicines(val id: Int, val name: String, val quantity: String, val time: String, val dateLimit: String) {
+import java.time.LocalTime
+import java.util.Date
+
+data class Medicines(val id: Int, val name: String, val quantity: String, val time: Int, val dateLimit: Date, var atDate: LocalTime) {
     override fun toString(): String {
         return "Medicines(id=$id, name='$name', category='$quantity', type='$time', date=$dateLimit)"
     }
