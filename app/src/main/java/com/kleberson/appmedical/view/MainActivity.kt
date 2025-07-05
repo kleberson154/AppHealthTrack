@@ -13,9 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.kleberson.appmedical.R
 import com.kleberson.appmedical.controller.UserController
 import com.kleberson.appmedical.util.VerticalSpaceItemDecoration
-import java.time.LocalDate
-import java.time.ZoneId
-import java.util.Date
 
 class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -30,13 +27,14 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1)
+        }
 
         val userController = UserController(this)
         val user = userController.getUserByEmail(emailUser)
-        val medicines = userController.getMedicinesUser(emailUser)
-
-        medicines.removeAll { it.dateLimit < Date.from(LocalDate.now(ZoneId.of("America/Sao_Paulo")).atStartOfDay(ZoneId.of("America/Sao_Paulo")).toInstant()) }
         userController.removeMedicinesExpired(emailUser)
+        val medicines = userController.getMedicinesUser(emailUser)
 
         val userName = findViewById<TextView>(R.id.textViewNameUser)
         userName.text = user.name

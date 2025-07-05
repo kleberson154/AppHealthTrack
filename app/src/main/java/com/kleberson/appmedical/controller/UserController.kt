@@ -31,7 +31,6 @@ class UserController(context: Context) {
             }
 
             val user = User(id = 0, name = name, email = email, contact = contact, password = password)
-
             db.insertUser(user)
             return true
         }catch (e: UserExistException) {
@@ -75,7 +74,6 @@ class UserController(context: Context) {
         return user
     }
 
-
     fun deleteMedicine(medicines: Medicines, context: Context) {
         try {
             db.deleteMedicine(medicines)
@@ -114,20 +112,22 @@ class UserController(context: Context) {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun removeMedicinesExpired(email: String) {
-        val medicines = getMedicinesUser(email)
+    fun removeMedicinesExpired(emailUser: String) {
+        val medicines = getMedicinesUser(emailUser)
         val now = LocalDate.now(ZoneId.of("America/Sao_Paulo"))
-        medicines.filter {
-            it.dateLimit.toInstant().atZone(ZoneId.of("America/Sao_Paulo")).toLocalDate() <= now
-        }.forEach { db.removeExpiredMedicines(it.id) }
+        for (medicine in medicines){
+            val medicineDateLimit = medicine.dateLimit.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+            if (medicineDateLimit.isBefore(now)) {
+                db.deleteMedicine(medicine)
+            }
+        }
     }
 
     fun updateMedicineTime(medicine: Medicines, novaAtDate: LocalTime?, context: Context?) {
         if (novaAtDate != null) {
             medicine.atDate = novaAtDate
             db.updateMedicineTime(medicine)
-            Toast.makeText(context, "Hora do medicamento atualizada com sucesso!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Dosagem Tomada, proximo horario atualizado!", Toast.LENGTH_SHORT).show()
         }
     }
-
 }

@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.kleberson.appmedical.R
 import com.kleberson.appmedical.controller.UserController
+import androidx.core.content.edit
 
 class LoginActivity: AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
@@ -36,7 +37,7 @@ class LoginActivity: AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            sharedPref.edit().clear().putString("email", email).putString("password", password).apply()
+            sharedPref.edit { clear().putString("email", email).putString("password", password) }
 
             val userController = UserController(this)
             val isLoginSuccessful = userController.loginUser(this, email, password)

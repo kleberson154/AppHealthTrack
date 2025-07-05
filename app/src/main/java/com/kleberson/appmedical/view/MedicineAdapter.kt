@@ -5,7 +5,6 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.media.Image
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
@@ -78,13 +77,6 @@ class MedicineAdapter(private val medicines: MutableList<Medicines>): RecyclerVi
                 context, position, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-//            val nextDoseMillis = System.currentTimeMillis() + 10_000
-//            alarmManager.setExactAndAllowWhileIdle(
-//                AlarmManager.RTC_WAKEUP,
-//                nextDoseMillis,
-//                pendingIntent
-//            )
 
             val nextDoseMillis = System.currentTimeMillis() + medicine.time * 60 * 60 * 1000
             alarmManager.setExact(
