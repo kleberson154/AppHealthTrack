@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.CalendarView
 import android.widget.EditText
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -50,6 +51,13 @@ class AddMedicinesActivity: AppCompatActivity() {
             val atDate = LocalTime.now(ZoneId.of("America/Sao_Paulo"))
 
             if (name.isNotEmpty() && quantity.isNotEmpty() && time.isNotEmpty()) {
+                if(dateLimit.before(Date())) {
+                    Toast(this).apply {
+                        setText("Data inválida, por favor selecione uma data futura")
+                        show()
+                    }
+                    return@setOnClickListener
+                }
                 userController.addMedicine(this, name = name, quantity = quantity, time = time.toInt(), dateLimit = dateLimit, atDate = atDate, emailUser = userEmail)
                 finish()
             } else {
