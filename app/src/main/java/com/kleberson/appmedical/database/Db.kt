@@ -9,14 +9,11 @@ import androidx.annotation.RequiresApi
 import com.kleberson.appmedical.model.Medicines
 import com.kleberson.appmedical.model.User
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.ZoneId
-import java.util.Date
 import java.util.Locale
 
 class Db(context: Context): SQLiteOpenHelper(context, "healthTrack.db", null, 1) {
-    val sdf = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH)
+    private val sdf = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH)
 
     override fun onCreate(db: android.database.sqlite.SQLiteDatabase) {
         db.execSQL("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT UNIQUE, password TEXT, contact TEXT)")
@@ -77,7 +74,6 @@ class Db(context: Context): SQLiteOpenHelper(context, "healthTrack.db", null, 1)
         }
     }
 
-
     fun deleteMedicine(medicines: Medicines) {
         val db = writableDatabase
         db.delete("medicines", "id = ?", arrayOf(medicines.id.toString()))
@@ -130,8 +126,4 @@ class Db(context: Context): SQLiteOpenHelper(context, "healthTrack.db", null, 1)
         db.update("medicines", values, "id = ?", arrayOf(medicine.id.toString()))
         db.close()
     }
-
 }
-
-//INSERT INTO medicines (name, quantity, time, dateLimit, atDate, user_id)
-//VALUES ('NomeDoRemedio', 'Quantidade', 8, '03/07/2025', '08:00', 1);

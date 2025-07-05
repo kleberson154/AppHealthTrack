@@ -13,9 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.kleberson.appmedical.R
 import com.kleberson.appmedical.controller.UserController
 import com.kleberson.appmedical.util.VerticalSpaceItemDecoration
-import java.time.LocalDate
-import java.time.ZoneId
-import java.util.Date
 
 class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)

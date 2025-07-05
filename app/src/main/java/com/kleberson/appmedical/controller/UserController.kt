@@ -31,7 +31,6 @@ class UserController(context: Context) {
             }
 
             val user = User(id = 0, name = name, email = email, contact = contact, password = password)
-
             db.insertUser(user)
             return true
         }catch (e: UserExistException) {
@@ -74,7 +73,6 @@ class UserController(context: Context) {
 
         return user
     }
-
 
     fun deleteMedicine(medicines: Medicines, context: Context) {
         try {
@@ -129,8 +127,7 @@ class UserController(context: Context) {
         if (novaAtDate != null) {
             medicine.atDate = novaAtDate
             db.updateMedicineTime(medicine)
-            Toast.makeText(context, "Hora do medicamento atualizada com sucesso!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Dosagem Tomada, proximo horario atualizado!", Toast.LENGTH_SHORT).show()
         }
     }
-
 }

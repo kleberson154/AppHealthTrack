@@ -61,7 +61,6 @@ class AddMedicinesActivity: AppCompatActivity() {
                 userController.addMedicine(this, name = name, quantity = quantity, time = time.toInt(), dateLimit = dateLimit, atDate = atDate, emailUser = userEmail)
                 finish()
             } else {
-
                 nameMedicine.error = "Preencha todos os campos"
             }
         }

@@ -5,7 +5,6 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.media.Image
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
