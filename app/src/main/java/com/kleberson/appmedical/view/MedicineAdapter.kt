@@ -79,13 +79,6 @@ class MedicineAdapter(private val medicines: MutableList<Medicines>): RecyclerVi
             )
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-//            val nextDoseMillis = System.currentTimeMillis() + 10_000
-//            alarmManager.setExactAndAllowWhileIdle(
-//                AlarmManager.RTC_WAKEUP,
-//                nextDoseMillis,
-//                pendingIntent
-//            )
-
             val nextDoseMillis = System.currentTimeMillis() + medicine.time * 60 * 60 * 1000
             alarmManager.setExact(
                 AlarmManager.RTC_WAKEUP,
